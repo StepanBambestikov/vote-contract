@@ -71,6 +71,8 @@ contract VoteContract is StakingContract {
             voteHistory[voteID].finalDecision = Decision.No;
         }
         emit VoteFinished(voteData.question, voteID, voteData.finalDecision);
+
+        //TODO добавить выпуск и хранение токена ERC
         return;
     }
 
