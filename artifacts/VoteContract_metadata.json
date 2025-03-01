@@ -80,6 +80,50 @@
 				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "question",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "voteID",
+						"type": "uint256"
+					}
+				],
+				"name": "VoteCreated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "question",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "voteID",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "enum VoteContract.Decision",
+						"name": "desition",
+						"type": "uint8"
+					}
+				],
+				"name": "VoteFinished",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
 						"indexed": true,
 						"internalType": "address",
 						"name": "user",
@@ -94,6 +138,19 @@
 				],
 				"name": "Withdrawn",
 				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "voteID",
+						"type": "uint256"
+					}
+				],
+				"name": "finishVote",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			},
 			{
 				"inputs": [],
@@ -131,6 +188,91 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "voteID",
+						"type": "uint256"
+					}
+				],
+				"name": "getVote",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "deadline",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "threshold",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "question",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "peopleVoted",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "yesVote",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "noVote",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum VoteContract.Decision",
+								"name": "finalDecision",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct VoteContract.Vote",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "question",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "threshold",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					}
+				],
+				"name": "initiateVote",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -235,6 +377,73 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "voteID",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "yes",
+						"type": "bool"
+					}
+				],
+				"name": "vote",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "voteHistory",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "threshold",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "question",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "peopleVoted",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "yesVote",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "noVote",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum VoteContract.Decision",
+						"name": "finalDecision",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "withdraw",
 				"outputs": [],
@@ -277,7 +486,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"stack_contract.sol": "StakingContract"
+			"vote_contract.sol": "VoteContract"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -329,6 +538,14 @@
 			"urls": [
 				"bzz-raw://a86964455d3a63756b18cea9fb5a2fa83d2bd601b45fc6d7538d57df1ab3c358",
 				"dweb:/ipfs/QmUEUi7EHmn8Tc6F518zp65PB7vNWBiUHfj9PnMf2HhGgA"
+			]
+		},
+		"vote_contract.sol": {
+			"keccak256": "0x773271c664bbbc01e1e29fe08b7a0ee3920407d8a6d5e39f9c94bb7cef12c11f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d9d69e457c1b61773f4ea16a92b6933d4ee3022dddbf6fb3d8f544064031b737",
+				"dweb:/ipfs/QmYXJRnNCJapCMRaszNLq72c7MpDoon9QgW1w6Dw4mgi18"
 			]
 		}
 	},

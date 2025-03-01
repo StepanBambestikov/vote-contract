@@ -43,9 +43,8 @@ contract StakingContract is ReentrancyGuard, Ownable {
         emit Staked(msg.sender, amount);
     }
 
-    function getStake() public view returns(uint256 stakedAmount, uint256 withdrawDate) {
-        Stake storage userStake = userStaking[msg.sender];
-        return (userStake.stakedAmount, userStake.withdrawDate);
+    function getStake() public view returns(Stake memory) {
+        return userStaking[msg.sender];
     }
 
     function getTotalStake() public view returns(uint256) {
