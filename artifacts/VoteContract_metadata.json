@@ -169,9 +169,9 @@
 								"type": "uint256"
 							}
 						],
-						"internalType": "struct StakingContract.Stake",
+						"internalType": "struct StakingContract.Stake[]",
 						"name": "",
-						"type": "tuple"
+						"type": "tuple[]"
 					}
 				],
 				"stateMutability": "view",
@@ -241,6 +241,25 @@
 						"internalType": "struct VoteContract.Vote",
 						"name": "",
 						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "hasVoted",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -358,6 +377,11 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"name": "userStaking",
@@ -533,19 +557,19 @@
 			]
 		},
 		"stack_contract.sol": {
-			"keccak256": "0x88fefd0ecc6ebb669c59d7fc09c68748e4e4974f001297bc009786b94aae0ed9",
+			"keccak256": "0x2082afddb444d1ec9aa6097df5d236d5ea1ed1138358d638dc3993db2be703fc",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a86964455d3a63756b18cea9fb5a2fa83d2bd601b45fc6d7538d57df1ab3c358",
-				"dweb:/ipfs/QmUEUi7EHmn8Tc6F518zp65PB7vNWBiUHfj9PnMf2HhGgA"
+				"bzz-raw://5c424e1df76fba9ceffa45f4546b8fc5d5e34bc1035d4aab9b92da3651cf300b",
+				"dweb:/ipfs/QmToz8V84NgP25u6vafqJFGQxwjVkGGWZchPL8hj4JHu4N"
 			]
 		},
 		"vote_contract.sol": {
-			"keccak256": "0x5489a19744d8f59a27ef7d5553f908c65dab74057e6750cde45d86ced0be568a",
+			"keccak256": "0x7626e8f157ed1166efe332f690eab46f48f8e27911c2a8825783dff3bbd4e90d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0e158516f2a7d6a67c3446a143172d4481f5d65365d3ddf8abbc6f5cb7ba324d",
-				"dweb:/ipfs/QmQviJrLb5YA2cJ1mfpHdxKBYoj8TRtEoYfSLPQMFHmaAa"
+				"bzz-raw://6aab4c528567e619adb4eb50265dcf2cf16d982f769edb60236a28a413ce9f73",
+				"dweb:/ipfs/QmXCDqJZxCmDVwMPwavvrNz1t73ASDfdru9qMnhHQMff3h"
 			]
 		}
 	},

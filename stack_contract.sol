@@ -12,7 +12,7 @@ contract StakingContract is ReentrancyGuard, Ownable {
 
     uint256 public totalStaked;
     
-    mapping(address => Stake) public userStaking;
+    mapping(address => Stake[]) public userStaking;
     
     struct Stake {
         uint256 stakedAmount;    
@@ -27,13 +27,17 @@ contract StakingContract is ReentrancyGuard, Ownable {
     }
     
     function stake(uint256 amount, uint256 period) external nonReentrant {
-        require(
-            userStaking[msg.sender].stakedAmount == 0 && userStaking[msg.sender].withdrawDate == 0,
-            "user already has stacking"
-        );
+        // require(
+        //     userStaking[msg.sender].stakedAmount == 0 && userStaking[msg.sender].withdrawDate == 0,
+        //     "user already has stacking"
+        // );
+
+        Stake memory newStack = Stake(amount, block.timestamp + period);
         
-        userStaking[msg.sender].stakedAmount = amount;
-        userStaking[msg.sender].withdrawDate = block.timestamp + period;
+        // userStaking[msg.sender].stakedAmount = amount;
+        // userStaking[msg.sender].withdrawDate = block.timestamp + period;
+
+        userStaking[msg.sender].push(newStack);
         
         bool success = stakingToken.transferFrom(msg.sender, address(this), amount);
         require(success, "Transfer failed");
@@ -43,7 +47,7 @@ contract StakingContract is ReentrancyGuard, Ownable {
         emit Staked(msg.sender, amount);
     }
 
-    function getStake() public view returns(Stake memory) {
+    function getStake() public view returns(Stake[] memory) {
         return userStaking[msg.sender];
     }
 
@@ -52,18 +56,25 @@ contract StakingContract is ReentrancyGuard, Ownable {
     }
     
     function withdraw() external nonReentrant {
-        Stake memory userStack = userStaking[msg.sender];
-        require(userStack.stakedAmount > 0, "Cannot withdraw 0");
-        require(userStack.withdrawDate <= block.timestamp, "Too early withdraw!");
+        Stake[] memory userStack = userStaking[msg.sender];
+        //require(userStack.stakedAmount > 0, "Cannot withdraw 0");
+        //require(userStack.withdrawDate <= block.timestamp, "Too early withdraw!");
+
+        uint256 unstackAmount = 0;
+
+        for (uint i = 0; i < userStack.length; i++) {
+            if (userStack[i].withdrawDate > 0 && userStack[i].stakedAmount > 0){
+                unstackAmount += userStack[i].stakedAmount;
+                userStaking[msg.sender][i] = Stake(0, 0);
+            }
+        }
         
-        bool success = stakingToken.transfer(msg.sender, userStack.stakedAmount);
+        bool success = stakingToken.transfer(msg.sender, unstackAmount);
         require(success, "Transfer failed");
 
-        totalStaked -= userStack.stakedAmount;
-
-        userStaking[msg.sender] = Stake(0, 0);
+        totalStaked -= unstackAmount;
         
-        emit Withdrawn(msg.sender, userStack.stakedAmount);
+        emit Withdrawn(msg.sender, unstackAmount);
     }
 
 }

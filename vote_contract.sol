@@ -13,6 +13,7 @@ import "stack_contract.sol";
 contract VoteContract is StakingContract {
 
     Vote[] public voteHistory;
+    mapping(address => bool) public hasVoted;
 
     struct Vote {
         uint256 deadline;    
@@ -82,7 +83,10 @@ contract VoteContract is StakingContract {
 
     //TODO сейчас чел может бесконечно голосовать блин
     function vote(uint256 voteID, bool yes) external indexInBounds(voteID, voteHistory.length){
-        Stake memory stake = getStake();
+        require(!hasVoted[msg.sender], "You have already voted.");
+
+
+        Stake[] memory stake = getStake();
         uint256 votingPower = _calculateVotingPower(stake);
         require(votingPower != 0, "Zero voting power");
 
@@ -93,10 +97,16 @@ contract VoteContract is StakingContract {
         } 
 
         voteHistory[voteID].peopleVoted++;
+        hasVoted[msg.sender] = true;
     }
 
-    function _calculateVotingPower(Stake memory stake) private pure returns (uint256){ 
-        return stake.stakedAmount * (stake.withdrawDate ** 2);
+    function _calculateVotingPower(Stake[] memory stakeList) private pure returns (uint256){ 
+        uint256 votingPower = 0;
+        for (uint i = 0; i < stakeList.length; i++) {
+            Stake memory stake = stakeList[i];
+            votingPower += stake.stakedAmount * (stake.withdrawDate ** 2);
+        }
+        return votingPower;
     }
 
 }
