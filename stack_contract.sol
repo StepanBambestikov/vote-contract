@@ -27,23 +27,11 @@ contract StakingContract is ReentrancyGuard, Ownable {
     }
     
     function stake(uint256 amount, uint256 period) external nonReentrant {
-        // require(
-        //     userStaking[msg.sender].stakedAmount == 0 && userStaking[msg.sender].withdrawDate == 0,
-        //     "user already has stacking"
-        // );
-
         Stake memory newStack = Stake(amount, block.timestamp + period);
-        
-        // userStaking[msg.sender].stakedAmount = amount;
-        // userStaking[msg.sender].withdrawDate = block.timestamp + period;
-
         userStaking[msg.sender].push(newStack);
-        
         bool success = stakingToken.transferFrom(msg.sender, address(this), amount);
         require(success, "Transfer failed");
-
         totalStaked += amount;
-        
         emit Staked(msg.sender, amount);
     }
 
@@ -57,8 +45,6 @@ contract StakingContract is ReentrancyGuard, Ownable {
     
     function withdraw() external nonReentrant {
         Stake[] memory userStack = userStaking[msg.sender];
-        //require(userStack.stakedAmount > 0, "Cannot withdraw 0");
-        //require(userStack.withdrawDate <= block.timestamp, "Too early withdraw!");
 
         uint256 unstackAmount = 0;
 

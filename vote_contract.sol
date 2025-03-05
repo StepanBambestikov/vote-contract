@@ -4,16 +4,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 import "stack_contract.sol";
 
 
-
-
 contract VoteContract is StakingContract {
-
+    using EnumerableMap for EnumerableMap.AddressToUintMap;
+    
     Vote[] public voteHistory;
-    mapping(address => bool) public hasVoted;
+    mapping(uint256 => EnumerableMap.AddressToUintMap) internal txUserVote;
 
     struct Vote {
         uint256 deadline;    
@@ -26,15 +26,22 @@ contract VoteContract is StakingContract {
     }
 
     enum Decision {
+        InProcess,
         Yes,
         No,
-        InProcess
+        Failed
+    }
+
+    enum UserVote {
+        NotVoted,
+        Yes,
+        No
     }
 
     event VoteCreated(string question, uint256 voteID);
     event VoteFinished(string question, uint256 voteID, Decision desition);
 
-    constructor(IERC20 _stakingToken) StakingContract(_stakingToken) {}
+    constructor(IERC20 _stakingToken) StakingContract(_stakingToken){}
 
     modifier indexInBounds(uint256 index, uint256 arrayLength) {
         require(index < arrayLength, "Index out of bounds");
@@ -42,6 +49,8 @@ contract VoteContract is StakingContract {
     }
 
     function initiateVote(string memory question, uint256 threshold, uint256 deadline) external onlyOwner returns(uint256){
+        require(threshold > 0 && threshold < 100, "threshold must be in 0 - 100 range");
+
         voteHistory.push(
             Vote({
                 deadline: deadline, 
@@ -57,7 +66,7 @@ contract VoteContract is StakingContract {
         return voteID;
     }
 
-    function finishVote(uint256 voteID) external indexInBounds(voteID, voteHistory.length){
+    function innerFinishVote(uint256 voteID) internal indexInBounds(voteID, voteHistory.length){
         Vote memory voteData = voteHistory[voteID];
         require(voteData.finalDecision == Decision.InProcess, "Already finished!");
 
@@ -72,8 +81,6 @@ contract VoteContract is StakingContract {
             voteHistory[voteID].finalDecision = Decision.No;
         }
         emit VoteFinished(voteData.question, voteID, voteData.finalDecision);
-
-        //TODO добавить выпуск и хранение токена ERC
         return;
     }
 
@@ -81,23 +88,26 @@ contract VoteContract is StakingContract {
         return voteHistory[voteID];
     }
 
-    //TODO сейчас чел может бесконечно голосовать блин
     function vote(uint256 voteID, bool yes) external indexInBounds(voteID, voteHistory.length){
-        require(!hasVoted[msg.sender], "You have already voted.");
+        require(!txUserVote[voteID].contains(msg.sender), "You have already voted.");
 
+        Vote memory voteData = voteHistory[voteID];
+        require(voteData.finalDecision == Decision.InProcess, "Voting not in process");
 
         Stake[] memory stake = getStake();
         uint256 votingPower = _calculateVotingPower(stake);
         require(votingPower != 0, "Zero voting power");
 
         if (yes){
-            voteHistory[voteID].yesVote += votingPower;
+            voteData.yesVote += votingPower;
+            txUserVote[voteID].set(msg.sender, uint256(UserVote.Yes));
         } else{
-            voteHistory[voteID].noVote += votingPower; 
+            voteData.noVote += votingPower; 
+            txUserVote[voteID].set(msg.sender, uint256(UserVote.No));
         } 
 
-        voteHistory[voteID].peopleVoted++;
-        hasVoted[msg.sender] = true;
+        voteData.peopleVoted++;
+        voteHistory[voteID] = voteData;
     }
 
     function _calculateVotingPower(Stake[] memory stakeList) private pure returns (uint256){ 
