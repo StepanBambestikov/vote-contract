@@ -20,6 +20,8 @@ contract StakingContract is ReentrancyGuard, Ownable {
     mapping(address => Stake[]) internal userStaking;
 
     using EnumerableSet for EnumerableSet.AddressSet;
+
+    // It is used for iterating over all stacks in the contract.
     EnumerableSet.AddressSet internal users;
     
     struct Stake {
@@ -29,12 +31,13 @@ contract StakingContract is ReentrancyGuard, Ownable {
     
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
-    
+
     
     constructor(IERC20 _stakingToken) Ownable(msg.sender) {
         stakingToken = _stakingToken;
     }
     
+    /// @dev The contract allows you to add multiple stacks with different amounts and stacking time.
     function stake(uint256 amount, uint256 period) external nonReentrant {
         require(
             period > 0 && period <= MAX_STAKING_PERIOD, 
@@ -56,6 +59,8 @@ contract StakingContract is ReentrancyGuard, Ownable {
         emit Staked(msg.sender, amount);
     }
 
+    /// @dev The function outputs all the stacks of the user, the time of which has expired,
+    /// if the user has no stacks or the time of his stacks has not ended, the call will end with an error
     function withdraw() external nonReentrant {
         Stake[] memory userStack = userStaking[msg.sender];
 

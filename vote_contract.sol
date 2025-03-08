@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "stack_contract.sol";
 
-
+// @dev The contract implements only the logic of voting and updating the relevant data.
+// The necessary tokens are generated in the legacy contract.
 contract VoteContract is StakingContract {
     using EnumerableMap for EnumerableMap.AddressToUintMap;
     
@@ -52,38 +53,38 @@ contract VoteContract is StakingContract {
 
     function initiateVote(string memory question, uint256 threshold, uint256 deadline) external onlyOwner returns(uint256){
         require(threshold > 0 && threshold < 100, "threshold must be in 0 - 100 range");
-
         voteHistory.push(
             Vote({
                 deadline: deadline, 
-                threshold: threshold, 
+                threshold: threshold,
                 question: question,
                 peopleVoted: 0,
                 yesVote: 0,  
                 noVote: 0 ,    
                 finalDecision: Decision.InProcess
             }));
+
         uint256 voteID = voteHistory.length - 1;
         emit VoteCreated(question, voteID);
         return voteID;
     }
 
-    function _threshold_reached(Vote memory voteData) private view returns(bool){
-        uint256 votingPower;
-        for (uint i = 0; i < users.length(); i++) {
-            Stake[] memory stake = getUserStake(users.at(i));
-            votingPower += _calculateVotingPower(stake);
-        }
-        return voteData.yesVote + voteData.noVote > (votingPower * voteData.threshold/100);
-    }
 
+    /// @dev The function implements the logic of completing the voting without generating a token related to it
+    /// The voting power is recorded by the user at the time of voting, 
+    /// and the full voting power is recorded at the time of finalizing. 
+    /// Accordingly, as time passes, the total force will decrease.
     function innerFinishVote(uint256 voteID) internal indexInBounds(voteID, voteHistory.length){
         Vote memory voteData = voteHistory[voteID];
         require(voteData.finalDecision == Decision.InProcess, "Already finished!");
 
         bool threshold_reached = _threshold_reached(voteData);
 
-        if (voteData.deadline > block.timestamp && !threshold_reached){
+        // Due to the specifics of the voting power calculation, 
+        // crossing the threshold may occur after the deadline if voting was completed too late,
+        // because the total voting power decreases with time.
+        // However, steaks cannot be added after the deadline.
+        if (voteData.deadline < block.timestamp && !threshold_reached){
             voteData.finalDecision = Decision.Failed;
             voteHistory[voteID] = voteData;
             emit VoteFinished(voteData.question, voteID, voteData.finalDecision);
@@ -111,11 +112,11 @@ contract VoteContract is StakingContract {
         return voteHistory[voteID];
     }
 
-    function vote(uint256 voteID, bool yes) external indexInBounds(voteID, voteHistory.length){
+    function vote(uint256 voteID, bool yes) external indexInBounds(voteID, voteHistory.length) nonReentrant {
         require(!txUserVote[voteID].contains(msg.sender), "You have already voted.");
 
         Vote memory voteData = voteHistory[voteID];
-        require(voteData.deadline <= block.timestamp, "The deadline has passed");
+        require(voteData.deadline < block.timestamp, "The deadline has passed");
         require(voteData.finalDecision == Decision.InProcess, "Voting not in process");
 
 
@@ -133,6 +134,16 @@ contract VoteContract is StakingContract {
 
         voteData.peopleVoted++;
         voteHistory[voteID] = voteData;
+    }
+
+    function _threshold_reached(Vote memory voteData) private view returns(bool){
+        //It's very expensive, therefore, it is called only at the finish vote. I don't know how to fix it :(
+        uint256 votingPower;
+        for (uint i = 0; i < users.length(); i++) {
+            Stake[] memory stake = getUserStake(users.at(i));
+            votingPower += _calculateVotingPower(stake);
+        }
+        return voteData.yesVote + voteData.noVote > (votingPower * voteData.threshold/100);
     }
 
     function _calculateVotingPower(Stake[] memory stakeList) private pure returns (uint256){ 
