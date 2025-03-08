@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "stack_contract.sol";
 
@@ -14,6 +15,7 @@ contract VoteContract is StakingContract {
     
     Vote[] public voteHistory;
     mapping(uint256 => EnumerableMap.AddressToUintMap) internal txUserVote;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     struct Vote {
         uint256 deadline;    
@@ -66,20 +68,41 @@ contract VoteContract is StakingContract {
         return voteID;
     }
 
+    function _threshold_reached(Vote memory voteData) private view returns(bool){
+        uint256 votingPower;
+        for (uint i = 0; i < users.length(); i++) {
+            Stake[] memory stake = getUserStake(users.at(i));
+            votingPower += _calculateVotingPower(stake);
+        }
+        return voteData.yesVote + voteData.noVote > (votingPower * voteData.threshold/100);
+    }
+
     function innerFinishVote(uint256 voteID) internal indexInBounds(voteID, voteHistory.length){
         Vote memory voteData = voteHistory[voteID];
         require(voteData.finalDecision == Decision.InProcess, "Already finished!");
 
+        bool threshold_reached = _threshold_reached(voteData);
+
+        if (voteData.deadline > block.timestamp && !threshold_reached){
+            voteData.finalDecision = Decision.Failed;
+            voteHistory[voteID] = voteData;
+            emit VoteFinished(voteData.question, voteID, voteData.finalDecision);
+            return;
+        }
+
         require(
-            voteData.deadline > block.timestamp || voteData.peopleVoted > 50, //TODO threshold
-             "Nor threshhold or deadline!"
+            threshold_reached,
+             "The threshold has not been reached, and voting cannot be completed."
         );
 
+
         if (voteData.yesVote > voteData.noVote){
-            voteHistory[voteID].finalDecision = Decision.Yes;
+            voteData.finalDecision = Decision.Yes;
         } else{
-            voteHistory[voteID].finalDecision = Decision.No;
+            voteData.finalDecision = Decision.No;
         }
+
+        voteHistory[voteID] = voteData;
         emit VoteFinished(voteData.question, voteID, voteData.finalDecision);
         return;
     }
@@ -92,7 +115,9 @@ contract VoteContract is StakingContract {
         require(!txUserVote[voteID].contains(msg.sender), "You have already voted.");
 
         Vote memory voteData = voteHistory[voteID];
+        require(voteData.deadline <= block.timestamp, "The deadline has passed");
         require(voteData.finalDecision == Decision.InProcess, "Voting not in process");
+
 
         Stake[] memory stake = getStake();
         uint256 votingPower = _calculateVotingPower(stake);

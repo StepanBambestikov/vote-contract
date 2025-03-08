@@ -211,35 +211,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "userStaking",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "stakedAmount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "withdrawDate",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [],
 				"name": "withdraw",
 				"outputs": [],
@@ -328,12 +299,20 @@
 				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
 			]
 		},
-		"stack_contract.sol": {
-			"keccak256": "0xbd36dbeff1ff013b4e5a5017e7a5de6d76947572211e6009940c9e527715150f",
+		"@openzeppelin/contracts/utils/structs/EnumerableSet.sol": {
+			"keccak256": "0x9b161e97b8967d4bc0c08d25741889a30692cdda4b71910bf1b0e315f1962212",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://90bc298fd724f8ad4f10c6077fd2447580cd391359873c89f66988ab8c898a1d",
-				"dweb:/ipfs/QmbZKR1PMjDuWFdQksvhg7mpoWiDT98QMa2DXXqcUViJNg"
+				"bzz-raw://821500c39d095eaa25b06f46e65f1d0e97c4c96b39227f79077dee7d9e84051f",
+				"dweb:/ipfs/QmSTeGorKzSWF6HAmxo32uCZiEuKNvreQdUiX1AaYtUMTz"
+			]
+		},
+		"stack_contract.sol": {
+			"keccak256": "0x5f1446647b6b86aaa02f18c452dd8c19af31622ffc451eed4375756f66126f4c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://69fd815654b69948a803ee72c2d72c583ddad54b2ee9796e7ab7b4f8fa19d19f",
+				"dweb:/ipfs/QmcWJgPxeknST1PnwYQCSJaBVRbcstbGNcgqWuHjikbyeu"
 			]
 		}
 	},

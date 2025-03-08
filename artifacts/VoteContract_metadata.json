@@ -342,35 +342,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "userStaking",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "stakedAmount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "withdrawDate",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "uint256",
 						"name": "voteID",
 						"type": "uint256"
@@ -541,19 +512,19 @@
 			]
 		},
 		"stack_contract.sol": {
-			"keccak256": "0xbd36dbeff1ff013b4e5a5017e7a5de6d76947572211e6009940c9e527715150f",
+			"keccak256": "0xae7cbe3bf5b1b9c525a87b62b24317dc89a59b8073c23d4ccf86bb86c7d4fd23",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://90bc298fd724f8ad4f10c6077fd2447580cd391359873c89f66988ab8c898a1d",
-				"dweb:/ipfs/QmbZKR1PMjDuWFdQksvhg7mpoWiDT98QMa2DXXqcUViJNg"
+				"bzz-raw://3a48c2406db6f27debb16c682f367cc6cd9ef092ca0f214004d229ad9a2f2dc7",
+				"dweb:/ipfs/QmNnqEuen57gsYUgj3aJRL1VYwmXwEajLLts1ft4ZPCKMG"
 			]
 		},
 		"vote_contract.sol": {
-			"keccak256": "0x745e15b6f571f44f668fea5e9600cd43136bcfaf48ec11a51996ce449f98cd5f",
+			"keccak256": "0x5f5496604814e67828413bd3722788c890bb53753bb957fa8d1cb00c60bd8e20",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://202f42e57ed6f91caa0441b3455f420b5c0333658f23413cea4358d47ae9b45b",
-				"dweb:/ipfs/QmWDkRNoBrTqijwygmUv1XcV3HaqG5KGeCG9sGU1PyPUi9"
+				"bzz-raw://6de116bbe7381a73097538495aded39085278bd75401a3b3eab1ee8cda21db97",
+				"dweb:/ipfs/QmTVfBvSutCKJ7shy1QRb7phqb6d6jsegrXzQsusF6ho6D"
 			]
 		}
 	},
