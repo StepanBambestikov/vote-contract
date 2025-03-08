@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -59,22 +59,20 @@ contract StakingContract is ReentrancyGuard, Ownable {
     /// @dev The function outputs all the stacks of the user, the time of which has expired,
     /// if the user has no stacks or the time of his stacks has not ended, the call will end with an error
     function withdraw() external nonReentrant {
-        Stake[] memory userStack = userStaking[msg.sender];
-
         uint256 unstackAmount = 0;
 
         bool useHasActiveStack;
-        for (uint i = 0; i < userStack.length; i++) {
+        for (uint i = 0; i < userStaking[msg.sender].length; i++) {
             if (
-                userStack[i].withdrawDate <= block.timestamp &&
-                userStack[i].stakedAmount > 0
+                userStaking[msg.sender][i].withdrawDate <= block.timestamp &&
+                userStaking[msg.sender][i].stakedAmount > 0
             ) {
-                unstackAmount += userStack[i].stakedAmount;
+                unstackAmount += userStaking[msg.sender][i].stakedAmount;
                 userStaking[msg.sender][i] = Stake(0, 0);
             }
             if (
-                !(userStack[i].withdrawDate <= block.timestamp) &&
-                userStack[i].stakedAmount > 0
+                !(userStaking[msg.sender][i].withdrawDate <= block.timestamp) &&
+                userStaking[msg.sender][i].stakedAmount > 0
             ) {
                 useHasActiveStack = true;
             }
@@ -85,7 +83,6 @@ contract StakingContract is ReentrancyGuard, Ownable {
 
         require(unstackAmount > 0, "No unstack amount");
 
-        userStaking[msg.sender] = userStack;
         bool success = stakingToken.transfer(msg.sender, unstackAmount);
         require(success, "Transfer failed");
 

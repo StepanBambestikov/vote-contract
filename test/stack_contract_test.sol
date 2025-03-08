@@ -29,7 +29,7 @@ contract StakingContractTest is Test {
         user2 = address(0x2);
 
         mockToken = new MockToken();
-        stakingContract = new StakingContract(address(mockToken));
+        stakingContract = new StakingContract(IERC20(address(mockToken)));
 
         mockToken.transfer(user1, USER_BALANCE);
         mockToken.transfer(user2, USER_BALANCE);
@@ -49,20 +49,23 @@ contract StakingContractTest is Test {
 
     //STACKING-------------------------------------------------------------------------------------//
 
-    function testFailZeroPeriod() public {
+    function testZeroPeriod() public {
         vm.startPrank(user1);
+        vm.expectRevert();
         stakingContract.stake(STAKE_AMOUNT, 0);
         vm.stopPrank();
     }
 
-    function testFailLargePeriod() public {
+    function testLargePeriod() public {
         vm.startPrank(user1);
-        stakingContract.stake(STAKE_AMOUNT, 7 years);
+        vm.expectRevert();
+        stakingContract.stake(STAKE_AMOUNT, 7 * 365 days);
         vm.stopPrank();
     }
 
-    function testFailZeroAmount() public {
+    function testZeroAmount() public {
         vm.startPrank(user1);
+        vm.expectRevert();
         stakingContract.stake(0, STAKING_PERIOD);
         vm.stopPrank();
     }
@@ -134,23 +137,26 @@ contract StakingContractTest is Test {
 
     //WITHDRAW-------------------------------------------------------------------------------------//
 
-    function testFailTransferFromFail() public {
+    function testTransferFromFail() public {
         vm.startPrank(user1);
+        vm.expectRevert();
         stakingContract.stake(STAKE_AMOUNT, STAKING_PERIOD);
         vm.stopPrank();
     }
 
-    function testFailWithdrawZeroAmount() public {
+    function testWithdrawZeroAmount() public {
         vm.startPrank(user1);
+        vm.expectRevert();
         stakingContract.withdraw();
         vm.stopPrank();
     }
 
-    function testFailWithdrawBeforePeriod() public {
+    function testWithdrawBeforePeriod() public {
         vm.startPrank(user1);
         mockToken.approve(address(stakingContract), STAKE_AMOUNT);
         stakingContract.stake(STAKE_AMOUNT, STAKING_PERIOD);
 
+        vm.expectRevert();
         stakingContract.withdraw();
         vm.stopPrank();
     }
@@ -188,12 +194,11 @@ contract StakingContractTest is Test {
         mockToken.approve(address(stakingContract), STAKE_AMOUNT * 2);
         stakingContract.stake(STAKE_AMOUNT * 2, STAKING_PERIOD * 2);
 
-        vm.startPrank(user2);
-        StakingContract.Stake[] memory stakes2 = stakingContract.getStake();
+        StakingContract.Stake[] memory stakes1 = stakingContract.getStake();
         vm.stopPrank();
 
-        assertEq(stakes1.length, 1);
-        assertEq(stakes1[0].stakedAmount, STAKE_AMOUNT * 2);
+        assertEq(stakes1.length, 2);
+        assertEq(stakes1[1].stakedAmount, STAKE_AMOUNT * 2);
 
         assertEq(stakingContract.getTotalStake(), STAKE_AMOUNT * 2);
     }
