@@ -1,0 +1,58 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compile",
+        "type": "shell",
+        "command": "forge build",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Test",
+        "type": "shell",
+        "command": "forge test",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Test with gas report",
+        "type": "shell",
+        "command": "forge test --gas-report",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Test with verbosity",
+        "type": "shell",
+        "command": "forge test -vvv",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Run specific test",
+        "type": "shell",
+        "command": "forge test --match-path ${file} -vvv",
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      }
+    ]
+  }

@@ -1,0 +1,16 @@
+{
+    "solidity.packageDefaultDependenciesContractsDirectory": "src",
+    "solidity.packageDefaultDependenciesDirectory": "lib",
+    "solidity.compileUsingRemoteVersion": "0.8.20",
+    "solidity.formatter": "prettier",
+    "editor.formatOnSave": true,
+    "[solidity]": {
+      "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+    },
+    "solidity.remappings": [
+      "@openzeppelin/=lib/openzeppelin-contracts/"
+      // Добавьте другие remappings при необходимости
+    ],
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
+  }
