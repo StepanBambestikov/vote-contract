@@ -12,13 +12,15 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 import "vote_contract.sol";
 
 
+// @dev The contract implements only the logic of the functioning of the NFT token,
+// which is created for each completed vote
 contract VoteTokenContract is VoteContract, ERC721 {
     using Strings for uint256;
     using EnumerableMap for EnumerableMap.AddressToUintMap;
-    
+
     constructor(IERC20 _stakingToken) VoteContract(_stakingToken) ERC721("VotingRecord", "VOTE") {}
 
-    function finishVote(uint256 voteID) internal indexInBounds(voteID, voteHistory.length){
+    function finishVote(uint256 voteID) public indexInBounds(voteID, voteHistory.length){
         innerFinishVote(voteID);
         _mint(msg.sender, voteID);
         return;
