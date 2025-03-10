@@ -13,130 +13,140 @@ import "src/vote_contract.sol";
 // @dev The contract implements only the logic of the functioning of the NFT token,
 // which is created for each completed vote
 contract VoteTokenContract is VoteContract, ERC721 {
-    using Strings for uint256;
-    using EnumerableMap for EnumerableMap.AddressToUintMap;
+  using Strings for uint256;
+  using EnumerableMap for EnumerableMap.AddressToUintMap;
 
-    constructor(
-        IERC20 _stakingToken
-    ) VoteContract(_stakingToken) ERC721("VotingRecord", "VOTE") {}
+  constructor(
+      IERC20 _stakingToken
+  ) VoteContract(_stakingToken) ERC721("VotingRecord", "VOTE") {}
 
-    function finishVote(
-        uint256 voteID
-    ) public indexInBounds(voteID, voteHistory.length) {
-        innerFinishVote(voteID);
-        _mint(msg.sender, voteID);
-        return;
-    }
+  function finishVote(
+      uint256 voteID
+  ) public indexInBounds(voteID, voteHistory.length) {
+      innerFinishVote(voteID);
+      _mint(msg.sender, voteID);
+      return;
+  }
 
-    function tokenURI(
-        uint256 tokenId
-    ) public view override returns (string memory) {
-        //require(_exists(tokenId), "URI query for nonexistent token"); TODO
+  function tokenURI(
+    uint256 tokenId
+) public view override returns (string memory) {
+    //require(_exists(tokenId), "URI query for nonexistent token");
 
-        return voteHistory[tokenId].question;
+    string memory baseJSON = _baseTokenJSON(tokenId);
+    string memory attributesJSON = _attributesJSON(tokenId);
+    string memory votersJSON = _getVotersJSON(txUserVote[tokenId]);
+    
+    string memory fullJSON = string(abi.encodePacked(
+        baseJSON,
+        attributesJSON,
+       ',"voters": [', votersJSON, ']}'
+    ));
+    
+    return string(
+        abi.encodePacked(
+            "data:application/json;base64,",
+            Base64.encode(bytes(fullJSON))
+        )
+    );
+}
 
-        // Vote storage voteData = voteHistory[tokenId];
+  function _baseTokenJSON(uint256 tokenId) private view returns (string memory) {
+      Vote storage voteData = voteHistory[tokenId];
+      
+      return string(abi.encodePacked(
+          '{',
+          '"name": "Vote #', tokenId.toString(), '",',
+          '"description": "', voteData.question, '"'
+      ));
+  }
 
-        // string memory decisionStr;
-        // if (voteData.finalDecision == Decision.Yes) {
-        //     decisionStr = "Yes";
-        // } else if (voteData.finalDecision == Decision.No) {
-        //     decisionStr = "No";
-        // } else {
-        //     decisionStr = "InProcess";
-        // }
+  function _attributesJSON(uint256 tokenId) private view returns (string memory) {
+    string memory part1 = _attributesPart1(tokenId);
+    string memory part2 = _attributesPart2(tokenId);
+    
+    return string(abi.encodePacked(
+        ',"attributes": [',
+        part1,
+        ',',
+        part2,
+        ']'
+    ));
+}
 
-        // string memory json = string(
-        //     abi.encodePacked(
-        //         '{"name": "Vote #',
-        //         tokenId.toString(),
-        //         '", "description": "',
-        //         voteData.question,
-        //         '", "attributes": [{"trait_type": "Yes Votes", "value": "',
-        //         voteData.yesVote.toString(),
-        //         '"}, {"trait_type": "No Votes", "value": "',
-        //         voteData.noVote.toString(),
-        //         '"}, {"trait_type": "People Voted", "value": "',
-        //         voteData.peopleVoted.toString(),
-        //         '"}, {"trait_type": "Decision", "value": "',
-        //         decisionStr,
-        //         '"}'
-        //     )
-        // );
+  function _attributesPart1(uint256 tokenId) private view returns (string memory) {
+    Vote storage voteData = voteHistory[tokenId];
+    
+    return string(abi.encodePacked(
+        '{',
+            '"trait_type": "Deadline",',
+            '"value": "', voteData.deadline.toString(), '"',
+        '},',
+        '{',
+            '"trait_type": "Threshold",',
+            '"value": "', voteData.threshold.toString(), '"',
+        '},',
+        '{',
+            '"trait_type": "Total Votes",',
+            '"value": "', voteData.peopleVoted.toString(), '"',
+        '}'
+    ));
+  }
 
-        // uint256 voterCount = txUserVote[tokenId].length();
-        // if (voterCount > 0) {
-        //     json = string(
-        //         abi.encodePacked(
-        //             json,
-        //             ', {"trait_type": "Voters Detail", "value": "'
-        //         )
-        //     );
+  function _attributesPart2(uint256 tokenId) private view returns (string memory) {
+    Vote storage voteData = voteHistory[tokenId];
+    
+    return string(abi.encodePacked(
+        '{',
+            '"trait_type": "Yes Votes",',
+            '"value": "', voteData.yesVote.toString(), '"',
+        '},',
+        '{',
+            '"trait_type": "No Votes",',
+            '"value": "', voteData.noVote.toString(), '"',
+        '},',
+        '{',
+            '"trait_type": "Decision",',
+            '"value": "', _getDecisionString(voteData.finalDecision), '"',
+        '}'
+    ));
+  }
 
-        //     for (uint256 i = 0; i < voterCount; i++) {
-        //         (address voter, uint256 voteWeight) = txUserVote[tokenId].at(i);
+  function _getDecisionString(Decision decision) private pure returns (string memory) {
+    if (decision == Decision.InProcess) return "Pending";
+    if (decision == Decision.Failed) return "Failed";
+    if (decision == Decision.Yes) return "Yes";
+    if (decision == Decision.No) return "No";
+    return "Invalid";
+  }
 
-        //         if (i > 0) {
-        //             json = string(abi.encodePacked(json, ", "));
-        //         }
-
-        //         json = string(
-        //             abi.encodePacked(
-        //                 json,
-        //                 toAsciiString(voter),
-        //                 ": ",
-        //                 voteWeight.toString()
-        //             )
-        //         );
-
-        //         if (i >= 9 && voterCount > 10) {
-        //             json = string(
-        //                 abi.encodePacked(
-        //                     json,
-        //                     "",
-        //                     (voterCount - 10).toString(),
-        //                     ""
-        //                 )
-        //             );
-        //             break;
-        //         }
-        //     }
-
-        //     json = string(abi.encodePacked(json, '"}'));
-        // }
-
-        // json = string(abi.encodePacked(json, "]}"));
-
-        // string memory encodedJson = Base64.encode(bytes(json));
-        // return
-        //     string(
-        //         abi.encodePacked("data:application/json;base64,", encodedJson)
-        //     );
-    }
-
-    function toAsciiString(address x) internal pure returns (string memory) {
-        bytes memory s = new bytes(42);
-        s[0] = "0";
-        s[1] = "x";
-
-        for (uint256 i = 0; i < 20; i++) {
-            bytes1 b = bytes1(
-                uint8(uint256(uint160(x)) / (2 ** (8 * (19 - i))))
-            );
-            bytes1 hi = bytes1(uint8(b) / 16);
-            bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
-            s[2 * i + 2] = char(hi);
-            s[2 * i + 3] = char(lo);
+  function _getVotersJSON(EnumerableMap.AddressToUintMap storage votedUsers) 
+    private view returns (string memory) {
+    
+    string memory votersJSON = "";
+    uint256 votersCount = EnumerableMap.length(votedUsers);
+    
+    for (uint256 i = 0; i < votersCount; i++) {
+        (address voter, uint voteValue) = votedUsers.at(i);
+        
+        string memory voteString = "NotVoted";
+        if (UserVote(voteValue) == UserVote.Yes) voteString = "Yes";
+        if (UserVote(voteValue) == UserVote.No) voteString = "No";
+        
+        votersJSON = string(abi.encodePacked(
+            votersJSON,
+            '{',
+                '"address": "', Strings.toHexString(uint160(voter), 20), '",',
+                '"vote": "', voteString, '"',
+            '}'
+        ));
+        
+        // Add comma if not the last element
+        if (i < votersCount - 1) {
+            votersJSON = string(abi.encodePacked(votersJSON, ","));
         }
-
-        return string(s);
     }
-
-    function char(bytes1 b) internal pure returns (bytes1) {
-        if (uint8(b) < 10) {
-            return bytes1(uint8(b) + 0x30);
-        } else {
-            return bytes1(uint8(b) + 0x57);
-        }
-    }
+    
+    return votersJSON;
+  }
 }

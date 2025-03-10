@@ -93,7 +93,7 @@ contract VoteTokenContractTest is Test {
         );
 
         voteTokenContract.tokenURI(voteID);
-
+        console.log(voteTokenContract.tokenURI(voteID));
         //assertEq(getSubstring(uri, 0, 29), "data:application/json;base64,");
     }
 
@@ -143,5 +143,7 @@ contract VoteTokenContractTest is Test {
         assertTrue(keccak256(bytes(uri1)) != keccak256(bytes(uri2)));
         assertTrue(keccak256(bytes(uri2)) != keccak256(bytes(uri3)));
         assertTrue(keccak256(bytes(uri1)) != keccak256(bytes(uri3)));
+
+        // console.log(uri1);
     }
 }
