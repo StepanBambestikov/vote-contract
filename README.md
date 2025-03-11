@@ -55,8 +55,8 @@ The project is deployed on Sepolia testnet.
 
 ### Contract Addresses (Sepolia)
 
-- TestToken: `0x5E9fD7Ba825C94E1f2bc55B38c1a3F57fEfE5E85`
-- VoteTokenContract: `0x4d5DF6A7A95A84A1208cB51Cb9D878Dbf2F51c4A`
+- TestToken: `0x4d5DF6A7A95A84A1208cB51Cb9D878Dbf2F51c4A`
+- VoteTokenContract: `0x5E9fD7Ba825C94E1f2bc55B38c1a3F57fEfE5E85`
 
 ### How to Deploy
 
