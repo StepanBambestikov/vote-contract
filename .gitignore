@@ -5,3 +5,5 @@ out/
 artifacts/
 .env
 last_deploy.txt
+broadcast/
+.DS_Store
