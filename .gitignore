@@ -1,4 +1,7 @@
-/.deps
-/.vscode
-/cashe
-/out
+.deps/
+.vscode/
+cache/
+out/
+artifacts/
+.env
+last_deploy.txt

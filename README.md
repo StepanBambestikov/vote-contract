@@ -67,6 +67,7 @@ The project is deployed on Sepolia testnet.
    ```
    PRIVATE_KEY=your_private_key
    SEPOLIA_RPC_URL=your_sepolia_rpc_url
+   VOTE_TOKEN_ADDRESS=your_vote_token_address //If not specified, an ERC20 test token will be created.
    ETHERSCAN_API_KEY=your_etherscan_api_key
    ```
 
