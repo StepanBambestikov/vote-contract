@@ -7,7 +7,7 @@ A decentralized staking and voting system with NFT token representations of vote
 - **Token Staking**: Users can stake tokens for different time periods
 - **Weighted Voting**: Voting power is calculated based on stake amount and duration
 - **NFT Vote Records**: Each completed vote is minted as an NFT with detailed metadata
-- **Threshold-Based Consensus**: Votes require minimum participation thresholds
+- **Threshold-Based Consensus**: Votes require minimum participation thresholds for all staking users
 
 ## Contract Structure
 
@@ -36,8 +36,8 @@ A decentralized staking and voting system with NFT token representations of vote
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/staking-voting-system.git
-cd staking-voting-system
+git https://github.com/StepanBambestikov/vote-contract.git
+cd vote-contract
 
 # Install dependencies
 forge install
