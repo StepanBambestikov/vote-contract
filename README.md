@@ -58,6 +58,11 @@ The project is deployed on Sepolia testnet.
 - TestToken: `0x4d5DF6A7A95A84A1208cB51Cb9D878Dbf2F51c4A`
 - VoteTokenContract: `0x5E9fD7Ba825C94E1f2bc55B38c1a3F57fEfE5E85`
 
+with Vote token (also Sepolia)
+
+- VoteToken: `0xD3835FE9807DAecc7dEBC53795E7170844684CeF`
+- VoteTokenContract: `0x712FD5B1d6AaDe083BffD9E029f258b2A66FD435`
+
 ### How to Deploy
 
 1. Set up environment variables:

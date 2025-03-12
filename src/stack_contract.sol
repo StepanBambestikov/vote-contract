@@ -70,6 +70,7 @@ contract StakingContract is ReentrancyGuard, Ownable {
                 unstackAmount += userStaking[msg.sender][i].stakedAmount;
                 userStaking[msg.sender][i] = Stake(0, 0);
             }
+            
             if (
                 !(userStaking[msg.sender][i].withdrawDate <= block.timestamp) &&
                 userStaking[msg.sender][i].stakedAmount > 0
